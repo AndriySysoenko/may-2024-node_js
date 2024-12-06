@@ -7,7 +7,8 @@ const foo = async () => {
     const dirs = ['folder1', 'folder2', 'folder3', 'folder4', 'folder5']
     const files = ['file1.txt', 'file2.txt', 'file3.txt', 'file4.txt', 'file5.txt']
         for (const folderName of dirs) {
-            const newFolder = await fs.mkdir(path.join('baseFolder', folderName), {recursive:true});
+            const newFolder = path.join('baseFolder', folderName);
+                await fs.mkdir(newFolder, {recursive:true});
 
             for (const fileName of files) {
                 await fs.writeFile(path.join(newFolder, fileName), "");
