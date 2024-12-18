@@ -58,5 +58,11 @@
     "name": "Dima",
     "email": "222@te.com",
     "password": "qwe123"
+  },
+  {
+    "id": 11,
+    "name": "Andrey",
+    "email": "andreyy@gmail.com",
+    "password": "cdb252NtD"
   }
 ]

@@ -1,12 +1,13 @@
 import { IUser, IUserDto } from "../interfaces/user.interface";
+import { User } from "../models/user.model";
 import { read, write } from "../services/fs.service";
 
 class UserRepository {
-  public async getList(): Promise<any[]> {
-    return await read();
+  public async getList(): Promise<IUser[]> {
+    return await User.find();
   }
 
-  public async create(dto: Partial<IUser>): Promise<any> {
+  public async create(dto: Partial<IUser>): Promise<IUser> {
     const users = await read();
     const newUser = {
       id: users.length ? users[users.length - 1].id + 1 : 1,
