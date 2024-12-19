@@ -1,46 +1,33 @@
-import { IUser, IUserDto } from "../interfaces/user.interface";
+import {
+  IUser,
+  IUserCreateDto,
+  IUserUpdateDto,
+} from "../interfaces/user.interface";
 import { User } from "../models/user.model";
-import { read, write } from "../services/fs.service";
 
 class UserRepository {
   public async getList(): Promise<IUser[]> {
     return await User.find();
   }
 
-  public async create(dto: Partial<IUser>): Promise<IUser> {
-    const users = await read();
-    const newUser = {
-      id: users.length ? users[users.length - 1].id + 1 : 1,
-      name: dto.name,
-      email: dto.email,
-      password: dto.password,
-    };
-    users.push(newUser);
-    await write(users);
-    return newUser;
+  public async create(dto: IUserCreateDto): Promise<IUser> {
+    return await User.create(dto);
   }
 
-  public async getById(userId: number): Promise<IUser> {
-    const users = await read();
-    return users.find((user) => user.id === userId);
+  public async getById(userId: string): Promise<IUser> {
+    return await User.findById(userId);
   }
 
-  public async updateById(userId: number, dto: IUserDto): Promise<IUser> {
-    const users = await read();
-    const index = users.findIndex((user) => user.id === Number(userId));
-    const user = users[index];
-    user.name = dto.name;
-    user.email = dto.email;
-    user.password = dto.password;
-    await write(users);
-    return user;
+  public async getByEmail(email: string): Promise<IUser> {
+    return await User.findOne({ email });
   }
 
-  public async deleteById(userId: number): Promise<void> {
-    const users = await read();
-    const index = users.findIndex((user) => user.id === Number(userId));
-    users.splice(index, 1);
-    await write(users);
+  public async updateById(userId: string, dto: IUserUpdateDto): Promise<IUser> {
+    return await User.findByIdAndUpdate(userId, dto, { new: true });
+  }
+
+  public async deleteById(userId: string): Promise<void> {
+    await User.deleteOne({ _id: userId });
   }
 }
 

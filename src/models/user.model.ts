@@ -1,12 +1,20 @@
 import { model, Schema } from "mongoose";
 
+import { RoleEnum } from "../enums/role.enum";
+import { IUser } from "../interfaces/user.interface";
+
 const userSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    age: { type: String, required: true },
+    age: { type: Number, required: true },
     password: { type: String, required: true },
-    role: { type: String, required: true, default: "user" },
+    role: {
+      enum: RoleEnum,
+      type: String,
+      required: true,
+      default: RoleEnum.USER,
+    },
     phone: { type: String, required: false },
     isDeleted: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
@@ -14,4 +22,4 @@ const userSchema = new Schema(
   { timestamps: true, versionKey: false },
 );
 
-export const User = model("users", userSchema);
+export const User = model<IUser>("users", userSchema);
