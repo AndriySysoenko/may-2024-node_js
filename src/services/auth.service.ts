@@ -56,6 +56,10 @@ class AuthService {
     await tokenRepository.create({ ...tokens, _userId: tokenPayload.userId });
     return tokens;
   }
+
+  public async logout({ userId }: { userId: string }): Promise<void> {
+    await tokenRepository.deleteAllByUserId(userId);
+  }
 }
 
 export const authService = new AuthService();

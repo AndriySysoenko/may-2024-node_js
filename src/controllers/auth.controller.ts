@@ -35,6 +35,18 @@ class AuthController {
       next(e);
     }
   }
+
+  public async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
+      await authService.logout({ userId: tokenPayload.userId });
+      res
+        .sendStatus(200)
+        .json({ message: "Logout successful. Please log in again." });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export const authController = new AuthController();

@@ -17,7 +17,8 @@
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.9.1"
+    "mongoose": "^8.9.1",
+    "nodemailer-express-handlebars": "^7.0.0"
   },
   "description": "",
   "devDependencies": {
@@ -26,6 +27,8 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^22.10.2",
+    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer-express-handlebars": "^4.0.5",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
     "eslint": "8.57.0",
