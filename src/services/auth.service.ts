@@ -1,8 +1,11 @@
+import { config } from "../configs/config";
+import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import { ILogin, IUser, IUserCreateDto } from "../interfaces/user.interface";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
+import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
 import { tokenService } from "./token.service";
 import { userService } from "./user.service";
@@ -57,8 +60,25 @@ class AuthService {
     return tokens;
   }
 
-  public async logout({ userId }: { userId: string }): Promise<void> {
-    await tokenRepository.deleteAllByUserId(userId);
+  public async logout(
+    tokenPayload: ITokenPayload,
+    tokenId: string,
+  ): Promise<void> {
+    const user = await userRepository.getById(tokenPayload.userId);
+    await tokenRepository.deleteOneByParams({ _id: tokenId });
+    await emailService.sendEmail(EmailTypeEnum.LOGOUT, "posokhh@gmail.com", {
+      name: user.name,
+      frontUrl: config.frontUrl,
+    });
+  }
+
+  public async logoutAll(tokenPayload: ITokenPayload): Promise<void> {
+    const user = await userRepository.getById(tokenPayload.userId);
+    await tokenRepository.deleteAllByParams({ _userId: tokenPayload.userId });
+    await emailService.sendEmail(EmailTypeEnum.LOGOUT, "posokhh@gmail.com", {
+      name: user.name,
+      frontUrl: config.frontUrl,
+    });
   }
 }
 

@@ -1,5 +1,3 @@
-import * as mongoose from "mongoose";
-
 import { IToken } from "../interfaces/token.interface";
 import { Token } from "../models/token.model";
 
@@ -16,9 +14,8 @@ class TokenRepository {
     await Token.deleteOne(params);
   }
 
-  public async deleteAllByUserId(userId: string): Promise<void> {
-    const objectId = new mongoose.Types.ObjectId(userId);
-    await Token.deleteMany({ _userId: objectId });
+  public async deleteAllByParams(params: Partial<IToken>): Promise<void> {
+    await Token.deleteMany(params);
   }
 }
 

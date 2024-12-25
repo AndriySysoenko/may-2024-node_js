@@ -39,10 +39,19 @@ class AuthController {
   public async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
-      await authService.logout({ userId: tokenPayload.userId });
-      res
-        .sendStatus(200)
-        .json({ message: "Logout successful. Please log in again." });
+      const tokenId = req.res.locals.token as string;
+      const result = await authService.logout(tokenPayload, tokenId);
+      res.json(result);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async logoutAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
+      const result = await authService.logoutAll(tokenPayload);
+      res.json(result);
     } catch (e) {
       next(e);
     }
