@@ -1,8 +1,15 @@
 import { config } from "../configs/config";
+import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
-import { ILogin, IUser, IUserCreateDto } from "../interfaces/user.interface";
+import {
+  IForgotPassword,
+  ILogin,
+  IUser,
+  IUserCreateDto,
+} from "../interfaces/user.interface";
+import { actionTokenRepository } from "../repositories/action-token.repository";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 import { emailService } from "./email.service";
@@ -83,6 +90,29 @@ class AuthService {
       name: user.name,
       frontUrl: config.frontUrl,
     });
+  }
+
+  public async forgotPassword(dto: IForgotPassword): Promise<void> {
+    const user = await userRepository.getByEmail(dto.email);
+    if (!user) return;
+    const token = tokenService.generateActionTokens(
+      { userId: user._id, role: user.role },
+      ActionTokenTypeEnum.FORGOT_PASSWORD,
+    );
+    await actionTokenRepository.create({
+      _userId: user._id,
+      token,
+      type: ActionTokenTypeEnum.FORGOT_PASSWORD,
+    });
+    await emailService.sendEmail(
+      EmailTypeEnum.FORGOT_PASSWORD,
+      "posokhh@gmail.com",
+      {
+        name: user.name,
+        frontUrl: config.frontUrl,
+        actinToken: token,
+      },
+    );
   }
 }
 

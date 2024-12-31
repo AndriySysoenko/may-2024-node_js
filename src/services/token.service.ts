@@ -1,6 +1,7 @@
 import * as jwt from "jsonwebtoken";
 
 import { config } from "../configs/config";
+import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api-error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
@@ -18,18 +19,49 @@ class TokenService {
       refreshToken,
     };
   }
-  public verifyToken(token: string, type: TokenTypeEnum): ITokenPayload {
+
+  public generateActionTokens(
+    payload: ITokenPayload,
+    type: ActionTokenTypeEnum,
+  ): string {
+    let secret: string;
+    let expiresIn: string;
+    switch (type) {
+      case ActionTokenTypeEnum.FORGOT_PASSWORD:
+        secret = config.actionForgotPasswordSecret;
+        expiresIn = config.actionForgotPasswordExpiresIn;
+        break;
+      case ActionTokenTypeEnum.EMAIL_VERIFICATION:
+        secret = config.actionEmailVerificationSecret;
+        expiresIn = config.actionEmailVerificationExpiresIn;
+        break;
+      default:
+        throw new ApiError("Invalid action token type", 401);
+    }
+    return jwt.sign(payload, secret, { expiresIn });
+  }
+
+  public verifyToken(
+    token: string,
+    type: TokenTypeEnum | ActionTokenTypeEnum,
+  ): ITokenPayload {
     try {
       let secret: string;
       switch (type) {
-        case "access":
+        case TokenTypeEnum.ACCESS:
           secret = config.jwtAccessSecret;
           break;
-        case "refresh":
+        case TokenTypeEnum.REFRESH:
           secret = config.jwtRefreshSecret;
           break;
+        case ActionTokenTypeEnum.FORGOT_PASSWORD:
+          secret = config.actionForgotPasswordSecret;
+          break;
+        case ActionTokenTypeEnum.EMAIL_VERIFICATION:
+          secret = config.actionEmailVerificationSecret;
+          break;
         default:
-          throw new ApiError("Invalid token type", 401);
+          throw new ApiError("Invalid token type", 500);
       }
 
       return jwt.verify(token, secret) as ITokenPayload;
