@@ -6,7 +6,7 @@ class ActionTokenRepository {
     return await ActionToken.create(dto);
   }
 
-  public async findByParams(
+  public async findOneByParams(
     params: Partial<IActionToken>,
   ): Promise<IActionToken> {
     return await ActionToken.findOne(params);

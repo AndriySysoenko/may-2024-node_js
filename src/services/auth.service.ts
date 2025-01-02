@@ -2,9 +2,11 @@ import { config } from "../configs/config";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api-error";
+import { IVerifyToken } from "../interfaces/action-token.interface";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import {
   IForgotPassword,
+  IForgotPasswordSet,
   ILogin,
   IUser,
   IUserCreateDto,
@@ -29,8 +31,23 @@ class AuthService {
       role: user.role,
     });
     await tokenRepository.create({ ...tokens, _userId: user._id });
+    // await emailService.sendEmail(EmailTypeEnum.WELCOME, "posokhh@gmail.com", {
+    //   name: user.name,
+    //   frontUrl: config.frontUrl,
+    // });
+
+    const actionToken = tokenService.generateActionTokens(
+      { userId: user._id, role: user.role },
+      ActionTokenTypeEnum.EMAIL_VERIFICATION,
+    );
+    await actionTokenRepository.create({
+      _userId: user._id,
+      token: actionToken,
+      type: ActionTokenTypeEnum.EMAIL_VERIFICATION,
+    });
     await emailService.sendEmail(EmailTypeEnum.WELCOME, "posokhh@gmail.com", {
       name: user.name,
+      actionToken,
       frontUrl: config.frontUrl,
     });
     return { user, tokens };
@@ -104,15 +121,39 @@ class AuthService {
       token,
       type: ActionTokenTypeEnum.FORGOT_PASSWORD,
     });
-    await emailService.sendEmail(
-      EmailTypeEnum.FORGOT_PASSWORD,
-      "posokhh@gmail.com",
-      {
-        name: user.name,
-        frontUrl: config.frontUrl,
-        actinToken: token,
-      },
+    await emailService.sendEmail(EmailTypeEnum.FORGOT_PASSWORD, dto.email, {
+      name: user.name,
+      frontUrl: config.frontUrl,
+      actionToken: token,
+    });
+  }
+
+  public async forgotPasswordSet(dto: IForgotPasswordSet): Promise<void> {
+    const payload = tokenService.verifyToken(
+      dto.token,
+      ActionTokenTypeEnum.FORGOT_PASSWORD,
     );
+    const entity = await actionTokenRepository.findOneByParams({
+      token: dto.token,
+    });
+    if (!entity) {
+      throw new ApiError("Invalid token", 401);
+    }
+    const password = await passwordService.hashPassword(dto.password);
+    await userRepository.updateById(payload.userId, { password });
+
+    await Promise.all([
+      actionTokenRepository.deleteOneByParams({ token: dto.token }),
+      tokenRepository.deleteAllByParams({ _userId: payload.userId }),
+    ]);
+  }
+
+  public async verify(
+    dto: IVerifyToken,
+    tokenPayload: ITokenPayload,
+  ): Promise<void> {
+    await userRepository.updateById(tokenPayload.userId, { isVerified: true });
+    await actionTokenRepository.deleteOneByParams({ token: dto.token });
   }
 }
 
