@@ -39,6 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
 const config_1 = require("./configs/config");
+const crons_1 = require("./crons");
 const auth_router_1 = require("./routers/auth.router");
 const user_router_1 = require("./routers/user.router");
 const app = (0, express_1.default)();
@@ -58,4 +59,5 @@ process.on("uncaughtException", (error) => {
 app.listen(config_1.config.port, async () => {
     await mongoose.connect(config_1.config.mongoUri);
     console.log(`Server has been started on port ${config_1.config.port}`);
+    await (0, crons_1.cronRunner)();
 });
