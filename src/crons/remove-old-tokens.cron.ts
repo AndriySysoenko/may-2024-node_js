@@ -9,10 +9,11 @@ const handler = async () => {
     const string = config.jwtRefreshExpiresIn;
     const { value, unit } = timeHelper.parseConfigString(string);
     const date = timeHelper.subtractCurrentByParams(value, unit);
-    await tokenRepository.deleteBeforeDate(date);
+    const count = await tokenRepository.deleteBeforeDate(date);
+    console.log(`Deleted ${count} tokens`);
   } catch (e) {
     console.error(e.message);
   }
 };
 
-export const removeOldTokensCron = new CronJob("*/10 * * * * *", handler);
+export const removeOldTokensCron = new CronJob("* * */12 * * *", handler);
