@@ -1,3 +1,5 @@
+import { FilterQuery } from "mongoose";
+
 import { IOldPassword } from "../interfaces/old-password.interface";
 import { OldPassword } from "../models/old-password.model";
 
@@ -11,7 +13,7 @@ class OldPasswordRepository {
   }
 
   public async deleteManyByParams(
-    params: Pick<IOldPassword, "_userId" | "createdAt">,
+    params: FilterQuery<IOldPassword>,
   ): Promise<void> {
     await OldPassword.deleteMany({ params });
   }
