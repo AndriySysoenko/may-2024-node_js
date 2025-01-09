@@ -1,9 +1,13 @@
+import { FilterQuery } from "mongoose";
+
 import { IUser, IUserCreateDto } from "../interfaces/user.interface";
 import { User } from "../models/user.model";
 
 class UserRepository {
-  public async getList(): Promise<IUser[]> {
-    return await User.find();
+  public async getList(query: any): Promise<IUser[]> {
+    const filterObject: FilterQuery<IUser> = { isDeleted: false };
+    const skip = query.limit * (query.page - 1);
+    return await User.find(filterObject).limit(query.limit).skip(skip);
   }
 
   public async create(dto: IUserCreateDto): Promise<IUser> {

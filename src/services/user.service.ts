@@ -8,8 +8,8 @@ import { userRepository } from "../repositories/user.repository";
 import { s3Service } from "./s3.service";
 
 class UserService {
-  public async getList(): Promise<IUser[]> {
-    return await userRepository.getList();
+  public async getList(query: any): Promise<IUser[]> {
+    return await userRepository.getList(query);
   }
 
   public async getMe(tokenPayload: ITokenPayload): Promise<IUser> {
