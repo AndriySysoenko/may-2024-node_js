@@ -1,4 +1,6 @@
+import { OrderEnum } from "../enums/order.enum";
 import { RoleEnum } from "../enums/role.enum";
+import { UserListOrderEnum } from "../enums/user-list-order.enum";
 
 export interface IUser {
   _id: string;
@@ -31,3 +33,36 @@ export type IChangePassword = {
   oldPassword: string;
   newPassword: string;
 };
+
+export type IUserListQuery = {
+  limit: number;
+  page: number;
+  search?: string;
+  order: OrderEnum;
+  orderBy: UserListOrderEnum;
+};
+
+export type IUserResponse = Pick<
+  IUser,
+  | "_id"
+  | "name"
+  | "email"
+  | "role"
+  | "age"
+  | "phone"
+  | "avatar"
+  | "isVerified"
+  | "isDeleted"
+  | "createdAt"
+  | "updatedAt"
+>;
+
+export type IUserShortResponse = Pick<
+  IUser,
+  "_id" | "name" | "avatar" | "createdAt"
+>;
+
+export interface IUserListResponse extends IUserListQuery {
+  data: IUserShortResponse[];
+  total: number;
+}

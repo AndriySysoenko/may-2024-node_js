@@ -39,6 +39,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const mongoose = __importStar(require("mongoose"));
+const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
+const swagger_json_1 = __importDefault(require("../docs/swagger.json"));
 const config_1 = require("./configs/config");
 const crons_1 = require("./crons");
 const auth_router_1 = require("./routers/auth.router");
@@ -47,6 +49,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, express_fileupload_1.default)());
+app.use("/docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_json_1.default));
 app.use("/auth", auth_router_1.authRouter);
 app.use("/users", user_router_1.userRouter);
 app.use("*", (error, req, res, next) => {

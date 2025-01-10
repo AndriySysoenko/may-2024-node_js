@@ -1,14 +1,19 @@
 import { config } from "../configs/config";
-import { IUser } from "../interfaces/user.interface";
+import {
+  IUser,
+  IUserListQuery,
+  IUserListResponse,
+  IUserResponse,
+  IUserShortResponse,
+} from "../interfaces/user.interface";
 
 class UserPresenter {
-  public toResponse(entity: IUser) {
+  public toResponse(entity: IUser): IUserResponse {
     return {
       _id: entity._id,
       name: entity.name,
       email: entity.email,
       age: entity.age,
-      password: entity.password,
       role: entity.role,
       phone: entity.phone,
       avatar: entity.avatar
@@ -21,7 +26,7 @@ class UserPresenter {
     };
   }
 
-  public toShortResponse(entity: IUser) {
+  public toShortResponse(entity: IUser): IUserShortResponse {
     return {
       _id: entity._id,
       name: entity.name,
@@ -29,6 +34,18 @@ class UserPresenter {
         ? `${config.AWS_S3_ENDPOINT}/${entity.avatar}`
         : null,
       createdAt: entity.createdAt,
+    };
+  }
+
+  public toResponseList(
+    entities: IUser[],
+    total: number,
+    query: IUserListQuery,
+  ): IUserListResponse {
+    return {
+      data: entities.map(this.toShortResponse),
+      total,
+      ...query,
     };
   }
 }
