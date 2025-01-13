@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import expressFileUpload from "express-fileupload";
+// import { rateLimit } from "express-rate-limit";
 import * as mongoose from "mongoose";
 import swaggerUi from "swagger-ui-express";
 
@@ -18,6 +19,7 @@ app.use(expressFileUpload());
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+// app.use(rateLimit({ windowMs: 30 * 1000, max: 100 }));
 app.use("/auth", authRouter);
 app.use("/users", userRouter);
 

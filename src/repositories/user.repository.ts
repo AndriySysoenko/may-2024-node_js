@@ -1,5 +1,7 @@
-import { FilterQuery } from "mongoose";
+import { FilterQuery, SortOrder } from "mongoose";
 
+import { UserListOrderEnum } from "../enums/user-list-order.enum";
+import { ApiError } from "../errors/api-error";
 import {
   IUser,
   IUserCreateDto,
@@ -21,8 +23,23 @@ class UserRepository {
     }
     const skip = query.limit * (query.page - 1);
 
+    const sortObject: { [key: string]: SortOrder } = {};
+    switch (query.orderBy) {
+      case UserListOrderEnum.NAME:
+        sortObject.name = query.order;
+        break;
+      case UserListOrderEnum.AGE:
+        sortObject.age = query.order;
+        break;
+      case UserListOrderEnum.CREATED_AT:
+        sortObject.createdAt = query.order;
+        break;
+      default:
+        throw new ApiError("Invalid order by", 400);
+    }
+
     const [entities, total] = await Promise.all([
-      User.find(filterObject).limit(query.limit).skip(skip),
+      User.find(filterObject).sort(sortObject).limit(query.limit).skip(skip),
       User.countDocuments(filterObject),
     ]);
     return { entities, total };
